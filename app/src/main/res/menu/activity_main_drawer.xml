@@ -22,24 +22,5 @@
             android:title="@string/Friends"
             android:icon="@drawable/ic_baseline_people_24"/>
 
-
-        <item android:title="@string/Profile">
-            <menu>
-                <item
-                    android:id="@+id/navMenuSettings"
-                    android:title="@string/Settings"
-                    android:icon="@drawable/ic_baseline_settings_24"/>
-            </menu>
-
-        </item>
-
-        <item android:title="@string/LogOut">
-            <menu>
-                <item
-                    android:id="@+id/navMenuLogOut"
-                    android:title="@string/LogOut"
-                    android:icon="@drawable/ic_baseline_login_24"/>
-            </menu>
-        </item>
     </group>
 </menu>

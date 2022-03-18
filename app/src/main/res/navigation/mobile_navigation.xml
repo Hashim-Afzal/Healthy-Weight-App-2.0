@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navMenuHome">
+    app:startDestination="@id/navMenuHome">
 
     <fragment
         android:id="@+id/navMenuHome"
@@ -22,5 +22,9 @@
         android:name="com.psyma17.healthyweightapplication.ui.weight.WeightFragment"
         android:label="@string/Weight"
         tools:layout="@layout/fragment_weight" />
-    <fragment android:id="@+id/placeholder" />
+    <fragment
+        android:id="@+id/navMenuFriends"
+        android:name="com.psyma17.healthyweightapplication.ui.friend.FriendFragment"
+        android:label="@string/Friends"
+        tools:layout="@layout/fragment_friend" />
 </navigation>

@@ -12,7 +12,7 @@ import com.psyma17.healthyweightapplication.databinding.FragmentWeightBinding
 
 class WeightFragment : Fragment() {
 
-    private lateinit var weightFragmentViewModel: WeightFragmentViewModel
+    private lateinit var weightViewModel: WeightViewModel
     private var _binding: FragmentWeightBinding? = null
 
     // This property is only valid between onCreateView and
@@ -24,14 +24,14 @@ class WeightFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        weightFragmentViewModel =
-            ViewModelProvider(this).get(WeightFragmentViewModel::class.java)
+        weightViewModel =
+            ViewModelProvider(this).get(WeightViewModel::class.java)
 
         _binding = FragmentWeightBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val textView: TextView = binding.textSlideshow
-        weightFragmentViewModel.text.observe(viewLifecycleOwner, Observer {
+        weightViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
         return root
