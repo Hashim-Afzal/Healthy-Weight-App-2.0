@@ -1,5 +1,6 @@
 package com.psyma17.healthyweightapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -13,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.psyma17.healthyweightapplication.databinding.ActivityMainBinding
+import com.psyma17.healthyweightapplication.ui.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,6 +56,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_settings) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
         return super.onOptionsItemSelected(item)
     }
 
