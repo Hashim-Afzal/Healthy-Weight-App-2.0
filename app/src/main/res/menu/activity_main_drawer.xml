@@ -5,16 +5,41 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/menu_home" />
+            android:id="@+id/navMenuHome"
+            android:title="@string/HomePage"
+            android:icon="@drawable/ic_baseline_home_24"/>
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:id="@+id/navMenuUserProfile"
+            android:title="@string/UserProfile"
+            android:icon="@drawable/ic_baseline_person_24"/>
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:id="@+id/navMenuWeight"
+            android:icon="@drawable/ic_baseline_bar_chart_24"
+            android:title="@string/Weight" />
+
+        <item
+            android:id="@+id/navMenuFriends"
+            android:title="@string/Friends"
+            android:icon="@drawable/ic_baseline_people_24"/>
+
+
+        <item android:title="@string/Profile">
+            <menu>
+                <item
+                    android:id="@+id/navMenuSettings"
+                    android:title="@string/Settings"
+                    android:icon="@drawable/ic_baseline_settings_24"/>
+            </menu>
+
+        </item>
+
+        <item android:title="@string/LogOut">
+            <menu>
+                <item
+                    android:id="@+id/navMenuLogOut"
+                    android:title="@string/LogOut"
+                    android:icon="@drawable/ic_baseline_login_24"/>
+            </menu>
+        </item>
     </group>
 </menu>

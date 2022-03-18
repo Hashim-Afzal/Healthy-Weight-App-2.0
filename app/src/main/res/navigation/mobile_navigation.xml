@@ -3,23 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/navMenuHome">
 
     <fragment
-        android:id="@+id/nav_home"
+        android:id="@+id/navMenuHome"
         android:name="com.psyma17.healthyweightapplication.ui.home.HomeFragment"
-        android:label="@string/menu_home"
+        android:label="@string/HomePage"
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.psyma17.healthyweightapplication.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/navMenuUserProfile"
+        android:name="com.psyma17.healthyweightapplication.ui.userprofile.UserProfileFragment"
+        android:label="@string/UserProfile"
+        tools:layout="@layout/fragment_userprofile" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.psyma17.healthyweightapplication.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/navMenuWeight"
+        android:name="com.psyma17.healthyweightapplication.ui.weight.WeightFragment"
+        android:label="@string/Weight"
+        tools:layout="@layout/fragment_weight" />
+    <fragment android:id="@+id/placeholder" />
 </navigation>
