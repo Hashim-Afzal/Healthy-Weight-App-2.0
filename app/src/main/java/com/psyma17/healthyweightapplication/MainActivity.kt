@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.navMenuHome, R.id.navMenuUserProfile, R.id.navMenuWeight, R.id.navMenuFriends
             ), drawerLayout
         )
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
@@ -59,7 +61,6 @@ class MainActivity : AppCompatActivity() {
         if (item.itemId == R.id.action_settings) {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
-            finish()
         }
         return super.onOptionsItemSelected(item)
     }

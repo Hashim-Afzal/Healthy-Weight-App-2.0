@@ -1,8 +1,10 @@
 package com.psyma17.healthyweightapplication.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import com.psyma17.healthyweightapplication.MainActivity
 import com.psyma17.healthyweightapplication.R
 
 class SettingsActivity : AppCompatActivity() {
@@ -17,6 +19,11 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return super.onSupportNavigateUp()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
