@@ -56,4 +56,7 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="OrRegister">Or register with ...</string>
+    <string name="DisplayName">Display Name</string>
+    <string name="EnterDisplayName">Enter Display Name ...</string>
+    <string name="DisplayNameNotFound">Display name not found</string>
 </resources>

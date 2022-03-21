@@ -11,6 +11,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.psyma17.healthyweightapplication.databinding.ActivityLoginBinding
+import com.psyma17.healthyweightapplication.databinding.ActivityRegisterBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,31 +22,29 @@ import kotlinx.coroutines.withContext
 const val REQUEST_CODE_SIGN_IN = 0
 
 class LoginActivity : AppCompatActivity() {
-
+    private lateinit var  binding: ActivityLoginBinding
     lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+
         auth = FirebaseAuth.getInstance()
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        //auth.signOut()
-
-        val btnRegisterMain = findViewById<Button>(R.id.btnRegisterMain)
-        btnRegisterMain.setOnClickListener {
+        binding.btnRegisterMain.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
 
-        val btnLoginMain = findViewById<Button>(R.id.btnLoginMain)
-        btnLoginMain.setOnClickListener {
+        binding.btnLoginMain.setOnClickListener {
             loginUser()
         }
     }
 
     private fun loginUser() {
-        val email = findViewById<EditText>(R.id.etEmailLogin).text.toString()
-        val password = findViewById<EditText>(R.id.etPasswordLogin).text.toString()
+        val email = binding.etEmailLogin.text.toString()
+        val password = binding.etPasswordLogin.text.toString()
         if (email.isNotEmpty() && password.isNotEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {

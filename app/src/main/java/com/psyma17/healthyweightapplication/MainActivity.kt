@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -48,6 +50,12 @@ class MainActivity : AppCompatActivity() {
             ), drawerLayout
         )
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val headerView = binding.navView.getHeaderView(0) as View
+        val tvUserName =  headerView.findViewById(R.id.header_displayName) as TextView
+        val tvEmail = headerView.findViewById(R.id.header_emailAddress) as TextView
+        tvEmail.text = auth.currentUser?.email ?: R.string.EmailNotFound.toString()
+        tvUserName.text = auth.currentUser?.displayName ?: R.string.DisplayNameNotFound.toString()
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
