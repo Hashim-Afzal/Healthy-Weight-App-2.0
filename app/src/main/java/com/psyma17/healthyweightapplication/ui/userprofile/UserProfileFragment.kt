@@ -8,12 +8,14 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.FirebaseAuth
 import com.psyma17.healthyweightapplication.databinding.FragmentUserprofileBinding
 
 class UserProfileFragment : Fragment() {
 
     private lateinit var userProfileViewModel: UserProfileViewModel
     private var _binding: FragmentUserprofileBinding? = null
+    lateinit var auth: FirebaseAuth
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -34,6 +36,10 @@ class UserProfileFragment : Fragment() {
         userProfileViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
+
+        auth = FirebaseAuth.getInstance()
+        binding.textDisplayName.text = auth.currentUser?.displayName.toString()
+
         return root
     }
 
