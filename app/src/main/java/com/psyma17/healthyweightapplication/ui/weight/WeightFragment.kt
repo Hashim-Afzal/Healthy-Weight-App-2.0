@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -26,8 +27,8 @@ import java.lang.StringBuilder
 class WeightFragment : Fragment() {
 
     private lateinit var weightViewModel: WeightViewModel
+    private lateinit var weightDataCollectionRef: CollectionReference
     private var _binding: FragmentWeightBinding? = null
-    private val weightDataCollectionRef = Firebase.firestore.collection("weight")
     lateinit var auth: FirebaseAuth
 
     // This property is only valid between onCreateView and
@@ -51,6 +52,7 @@ class WeightFragment : Fragment() {
         })
 
         auth = FirebaseAuth.getInstance()
+        weightDataCollectionRef = Firebase.firestore.collection("weight/" + auth.currentUser?.uid + "/weightData")
         subscribeToRealTimeUpdates()
         binding.btnWeightSubmit.setOnClickListener {
             btnSaveWeightData()
@@ -94,13 +96,16 @@ class WeightFragment : Fragment() {
 
     private fun btnSaveWeightData() {
         val temp = binding.editTextNumberDecimal.text.toString()
-        if (temp == "") {
+        if (temp.isEmpty()) {
             return
         }
+
         val currentWeight = temp.toDouble()
+        /*
         if (currentWeight < 10 || currentWeight > 300) {
             return
         }
+         */
         val currentTime = System.currentTimeMillis()
         val weightData = WeightData(currentWeight, currentTime)
         saveWeightData(weightData)

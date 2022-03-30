@@ -3,12 +3,14 @@ package com.psyma17.healthyweightapplication
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
+import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.psyma17.healthyweightapplication.databinding.ActivityMainBinding
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.psyma17.healthyweightapplication.data.UserProfileData
 import com.psyma17.healthyweightapplication.databinding.ActivityRegisterBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +21,11 @@ import kotlinx.coroutines.withContext
 class RegisterActivity : AppCompatActivity() {
     private lateinit var  binding: ActivityRegisterBinding
     lateinit var auth: FirebaseAuth
+
+    companion object {
+
+        private val TAG = "RegisterActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +48,9 @@ class RegisterActivity : AppCompatActivity() {
                 try {
                     auth.createUserWithEmailAndPassword(email, password).await()
                     withContext(Dispatchers.Main) {
+                        if (auth.currentUser != null) {
+                            saveUserProfileData()
+                        }
                         checkLoggedInState()
                     }
                     auth.currentUser?.let {
@@ -71,5 +81,20 @@ class RegisterActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         checkLoggedInState()
+    }
+
+    private fun saveUserProfileData() = CoroutineScope(Dispatchers.IO).launch {
+        val userProfileData = UserProfileData(
+            auth.currentUser?.uid.toString(),
+            binding.etDisplayNameRegister.text.toString(),
+            "lose",
+            false,
+            true,
+            0.0)
+
+        Firebase.firestore.collection("users").document(auth.currentUser?.uid.toString())
+            .set(userProfileData)
+            .addOnSuccessListener { Log.d(TAG, "User profile successfully written!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
     }
 }
