@@ -59,4 +59,5 @@
     <string name="DisplayName">Display Name</string>
     <string name="EnterDisplayName">Enter Display Name ...</string>
     <string name="DisplayNameNotFound">Display name not found</string>
+    <string name="EnterFriendName">Enter Friend Name ...</string>
 </resources>

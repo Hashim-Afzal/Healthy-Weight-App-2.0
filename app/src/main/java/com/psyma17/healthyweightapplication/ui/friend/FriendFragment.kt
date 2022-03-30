@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import com.psyma17.healthyweightapplication.R
@@ -36,9 +37,11 @@ class FriendFragment : Fragment() {
         _binding = FragmentFriendBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textFriend
+        setUpSearchView()
+
+        //val textView: TextView = binding.textFriend
         viewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
+            //textView.text = it
         })
         return root
     }
@@ -46,5 +49,17 @@ class FriendFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun setUpSearchView() {
+        binding.friendSearchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+        })
     }
 }
