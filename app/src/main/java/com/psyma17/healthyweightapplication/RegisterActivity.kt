@@ -48,9 +48,6 @@ class RegisterActivity : AppCompatActivity() {
                 try {
                     auth.createUserWithEmailAndPassword(email, password).await()
                     withContext(Dispatchers.Main) {
-                        if (auth.currentUser != null) {
-                            saveUserProfileData()
-                        }
                         checkLoggedInState()
                     }
                     auth.currentUser?.let {
@@ -58,6 +55,7 @@ class RegisterActivity : AppCompatActivity() {
                             .setDisplayName(displayName)
                             .build()
                         it.updateProfile(profileUpdates).await()
+                        saveUserProfileData()
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
@@ -84,17 +82,12 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun saveUserProfileData() = CoroutineScope(Dispatchers.IO).launch {
-        val userProfileData = UserProfileData(
-            auth.currentUser?.uid.toString(),
-            binding.etDisplayNameRegister.text.toString(),
-            "lose",
-            false,
-            true,
-            0.0)
+        val userRef = Firebase.firestore.collection("users").document(auth.currentUser?.uid.toString())
 
-        Firebase.firestore.collection("users").document(auth.currentUser?.uid.toString())
-            .set(userProfileData)
-            .addOnSuccessListener { Log.d(TAG, "User profile successfully written!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+        userRef
+            .update("userName", binding.etDisplayNameRegister.text.toString())
+            .addOnSuccessListener { Log.d(TAG, "Display Name successfully updated!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+            .await()
     }
 }
