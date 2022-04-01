@@ -55,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
                             .setDisplayName(displayName)
                             .build()
                         it.updateProfile(profileUpdates).await()
-                        saveUserProfileData()
+                        //saveUserProfileData()
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
@@ -83,7 +83,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun saveUserProfileData() = CoroutineScope(Dispatchers.IO).launch {
         val userRef = Firebase.firestore.collection("users").document(auth.currentUser?.uid.toString())
-
+        val userProfileData = UserProfileData(uid = auth.currentUser?.uid.toString() ,userName = binding.etDisplayNameRegister.text.toString())
         userRef
             .update("userName", binding.etDisplayNameRegister.text.toString())
             .addOnSuccessListener { Log.d(TAG, "Display Name successfully updated!") }

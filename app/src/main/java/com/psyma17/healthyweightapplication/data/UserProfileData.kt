@@ -7,4 +7,5 @@ data class UserProfileData(
     var meetFriend: Boolean = false,
     var public: Boolean = true,
     var currentWeight: Double = 0.0,
+    var aboutMe: String = "This user has not written an about me yet.",
 )
