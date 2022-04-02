@@ -40,6 +40,8 @@
     <string name="EnterWeight">Enter weight</string>
     <string name="action_logout">Log Out</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="aboutMe">About me:</string>
+    <string name="currentWeight">Current weight:</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -60,4 +62,7 @@
     <string name="EnterDisplayName">Enter Display Name ...</string>
     <string name="DisplayNameNotFound">Display name not found</string>
     <string name="EnterFriendName">Enter Friend Name ...</string>
+    <string name="objective">Objective</string>
+    <string name="lookingToMeet">Looking to meet?</string>
+    <string name="EditProfile">Edit Profile</string>
 </resources>

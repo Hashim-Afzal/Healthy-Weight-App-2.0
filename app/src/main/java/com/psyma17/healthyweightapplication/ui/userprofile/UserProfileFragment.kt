@@ -38,7 +38,7 @@ class UserProfileFragment : Fragment() {
         })
 
         auth = FirebaseAuth.getInstance()
-        binding.textDisplayName.text = auth.currentUser?.displayName.toString()
+        // binding.textDisplayName.text = auth.currentUser?.displayName.toString()
 
         return root
     }
