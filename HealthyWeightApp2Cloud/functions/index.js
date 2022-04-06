@@ -21,6 +21,7 @@ exports.addUserToFirestoreUsers = functions.auth.user().onCreate((user) => {
     public: true,
     uid: user.uid,
     userName: "",
+    aboutMe: "",
   });
 
   const friendRef = admin.firestore().collection("friends")
