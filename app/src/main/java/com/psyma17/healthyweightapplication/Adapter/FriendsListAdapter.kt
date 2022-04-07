@@ -10,9 +10,11 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.psyma17.healthyweightapplication.R
 import com.psyma17.healthyweightapplication.data.FriendData
 import com.psyma17.healthyweightapplication.data.UserProfileData
+import kotlinx.coroutines.Deferred
 
-class FriendsListAdapter(private var userList : ArrayList<FriendData>) : RecyclerView.Adapter<FriendsListAdapter.FriendsListViewHolder>() {
+class FriendsListAdapter(private var userList : ArrayList<UserProfileData>) : RecyclerView.Adapter<FriendsListAdapter.FriendsListViewHolder>() {
 
+    var onItemClick: ((UserProfileData) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendsListViewHolder {
 
@@ -27,7 +29,7 @@ class FriendsListAdapter(private var userList : ArrayList<FriendData>) : Recycle
         val currentItem = userList[position]
         // Change after implementing user images
         holder.friendsListImage.setImageResource(R.drawable.ic_baseline_person_24)
-        holder.tvFriendName.text = currentItem.uid
+        holder.tvFriendName.text = currentItem.userName
     }
 
     override fun getItemCount(): Int {
@@ -35,16 +37,21 @@ class FriendsListAdapter(private var userList : ArrayList<FriendData>) : Recycle
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun addNewItem(itemsNew: ArrayList<FriendData>){
+    fun addNewItem(itemsNew: ArrayList<UserProfileData>){
         userList.addAll(itemsNew)
         notifyDataSetChanged()
     }
 
-    class FriendsListViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
+    inner class FriendsListViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
 
         val friendsListImage : ShapeableImageView = itemView.findViewById(R.id.friend_list_image)
         val tvFriendName : TextView = itemView.findViewById(R.id.friend_list_name)
 
 
+        init {
+            itemView.setOnClickListener {
+                onItemClick?.invoke(userList[adapterPosition])
+            }
+        }
     }
 }

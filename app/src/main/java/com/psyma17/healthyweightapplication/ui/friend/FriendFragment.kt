@@ -8,32 +8,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.TextView
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.psyma17.healthyweightapplication.Adapter.FriendsListAdapter
-import com.psyma17.healthyweightapplication.R
 import com.psyma17.healthyweightapplication.data.FriendData
 import com.psyma17.healthyweightapplication.data.UserProfileData
 import com.psyma17.healthyweightapplication.databinding.FragmentFriendBinding
-import com.psyma17.healthyweightapplication.ui.friend.FriendFragment
 import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 class FriendFragment : Fragment() {
 
     private lateinit var viewModel: FriendViewModel
     private lateinit var friendsListAdapter: FriendsListAdapter
-    private lateinit var friendsList: ArrayList<FriendData>
     private lateinit var userProfileList: ArrayList<UserProfileData>
     private var _binding: FragmentFriendBinding? = null
     private lateinit var auth: FirebaseAuth
-    private val userRef = Firebase.firestore.collection("users")
     private lateinit var friendRef: CollectionReference
 
     // This property is only valid between onCreateView and
@@ -51,17 +46,7 @@ class FriendFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         friendRef = Firebase.firestore.collection("friends/" + auth.currentUser?.uid + "/friendData")
 
-
-        friendsList = ArrayList<FriendData>()
-        friendsList.add(FriendData("sakjbfjabkj"))
-        binding.friendRecyclerView.layoutManager = LinearLayoutManager(context)
-        binding.friendRecyclerView.setHasFixedSize(true)
-
-        retrieveFriendData()
-
-        friendsListAdapter = FriendsListAdapter(friendsList)
-        binding.friendRecyclerView.adapter = friendsListAdapter
-
+        setUpRecyclerView()
         setUpSearchView()
 
         return root
@@ -84,20 +69,67 @@ class FriendFragment : Fragment() {
         })
     }
 
-    private fun retrieveFriendData() = CoroutineScope(Dispatchers.IO).launch {
-        val arrayList = arrayListOf<FriendData>()
+    private fun setUpRecyclerView() {
+        userProfileList = ArrayList<UserProfileData>()
+        binding.friendRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.friendRecyclerView.setHasFixedSize(true)
+        friendsListAdapter = FriendsListAdapter(userProfileList)
+        binding.friendRecyclerView.adapter = friendsListAdapter
+        friendsListAdapter.onItemClick = {
+            Log.d("TAG", "User ID " + it.uid)
+        }
+        addFriendsToRecyclerView()
+    }
+
+    private fun addFriendsToRecyclerView() = CoroutineScope(Dispatchers.IO).launch {
+        val arrayListFriendData = arrayListOf<FriendData>()
         friendRef
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     Log.d("TAG", "${document.id} => ${document.data}")
-                    arrayList.add(document.toObject<FriendData>())
+                    arrayListFriendData.add(document.toObject<FriendData>())
                 }
-                friendsListAdapter.addNewItem(arrayList)
+               CoroutineScope(Dispatchers.IO).launch {
+                   val arrayListUserProfileData = getUserProfileDataList(arrayListFriendData)
+                   withContext(Dispatchers.Main) {
+                       friendsListAdapter.addNewItem(arrayListUserProfileData)
+                   }
+                }
             }
             .addOnFailureListener { exception ->
                 Log.d("TAG", "get failed with ", exception)
             }
     }
 
+    private suspend fun getUserProfileDataList(friendDataList: ArrayList<FriendData>): ArrayList<UserProfileData> {
+        val userProfilesData = mutableListOf<Deferred<UserProfileData>>()
+        coroutineScope {
+            for (friendData in friendDataList) {
+                val userProfileData = async {
+                    getUserProfileData(friendData.uid)
+                }
+                userProfilesData.add(userProfileData)
+            }
+        }
+        return ArrayList(userProfilesData.awaitAll())
+    }
+
+    private suspend fun getUserProfileData(uidFriend: String): UserProfileData {
+        return try {
+            val document = Firebase.firestore.collection("users").document(uidFriend)
+                .get()
+                .await()
+            if (document != null) {
+                Log.d("TAG", "DocumentSnapshot data: ${document.data}")
+                document.toObject<UserProfileData>()!!
+            } else {
+                Log.d("TAG", "No such document")
+                UserProfileData()
+            }
+        } catch (e : Exception) {
+            Log.d("TAG", "get failed with ", e)
+            UserProfileData()
+        }
+    }
 }
