@@ -1,5 +1,6 @@
 package com.psyma17.healthyweightapplication.ui.friend
 
+import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +16,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.psyma17.healthyweightapplication.Adapter.FriendsListAdapter
+import com.psyma17.healthyweightapplication.ChatActivity
 import com.psyma17.healthyweightapplication.data.FriendData
 import com.psyma17.healthyweightapplication.data.UserProfileData
 import com.psyma17.healthyweightapplication.databinding.FragmentFriendBinding
@@ -27,6 +29,7 @@ class FriendFragment : Fragment() {
     private lateinit var viewModel: FriendViewModel
     private lateinit var friendsListAdapter: FriendsListAdapter
     private lateinit var userProfileList: ArrayList<UserProfileData>
+    private lateinit var userProfileListSearch: ArrayList<UserProfileData>
     private var _binding: FragmentFriendBinding? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var friendRef: CollectionReference
@@ -60,11 +63,29 @@ class FriendFragment : Fragment() {
     private fun setUpSearchView() {
         binding.friendSearchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                return true
+                Log.d("TAG", "Entering search view")
+                userProfileListSearch = ArrayList<UserProfileData>()
+                Firebase.firestore.collection("users")
+                    .whereEqualTo("meetFriend", true)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        for (document in documents) {
+                            if (document.toObject<UserProfileData>().userName.contains(p0.toString(), ignoreCase = true)) {
+                                userProfileListSearch.add(document.toObject<UserProfileData>())
+                            }
+                            Log.d("TAG setupSearchView", "${document.id} => ${document.data}")
+                        }
+                        friendsListAdapter.setNewItems(userProfileListSearch)
+                        userProfileListSearch.clear()
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("TAG", "get failed search with ", exception)
+                    }
+                return false
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-                return false
+                return true
             }
         })
     }
@@ -77,6 +98,9 @@ class FriendFragment : Fragment() {
         binding.friendRecyclerView.adapter = friendsListAdapter
         friendsListAdapter.onItemClick = {
             Log.d("TAG", "User ID " + it.uid)
+            val intent = Intent(activity, ChatActivity::class.java)
+            intent.putExtra(ChatActivity.UID_FRIEND_EXTRA, it.uid)
+            startActivity(intent)
         }
         addFriendsToRecyclerView()
     }
@@ -91,9 +115,9 @@ class FriendFragment : Fragment() {
                     arrayListFriendData.add(document.toObject<FriendData>())
                 }
                CoroutineScope(Dispatchers.IO).launch {
-                   val arrayListUserProfileData = getUserProfileDataList(arrayListFriendData)
+                   val arrayListUserProfileData = getUserProfileDataListFromFriendData(arrayListFriendData)
                    withContext(Dispatchers.Main) {
-                       friendsListAdapter.addNewItem(arrayListUserProfileData)
+                       friendsListAdapter.setNewItems(arrayListUserProfileData)
                    }
                 }
             }
@@ -102,7 +126,7 @@ class FriendFragment : Fragment() {
             }
     }
 
-    private suspend fun getUserProfileDataList(friendDataList: ArrayList<FriendData>): ArrayList<UserProfileData> {
+    private suspend fun getUserProfileDataListFromFriendData(friendDataList: ArrayList<FriendData>): ArrayList<UserProfileData> {
         val userProfilesData = mutableListOf<Deferred<UserProfileData>>()
         coroutineScope {
             for (friendData in friendDataList) {

@@ -8,9 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.psyma17.healthyweightapplication.R
-import com.psyma17.healthyweightapplication.data.FriendData
 import com.psyma17.healthyweightapplication.data.UserProfileData
-import kotlinx.coroutines.Deferred
 
 class FriendsListAdapter(private var userList : ArrayList<UserProfileData>) : RecyclerView.Adapter<FriendsListAdapter.FriendsListViewHolder>() {
 
@@ -37,7 +35,8 @@ class FriendsListAdapter(private var userList : ArrayList<UserProfileData>) : Re
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun addNewItem(itemsNew: ArrayList<UserProfileData>){
+    fun setNewItems(itemsNew: ArrayList<UserProfileData>){
+        userList.clear()
         userList.addAll(itemsNew)
         notifyDataSetChanged()
     }
@@ -46,7 +45,6 @@ class FriendsListAdapter(private var userList : ArrayList<UserProfileData>) : Re
 
         val friendsListImage : ShapeableImageView = itemView.findViewById(R.id.friend_list_image)
         val tvFriendName : TextView = itemView.findViewById(R.id.friend_list_name)
-
 
         init {
             itemView.setOnClickListener {
