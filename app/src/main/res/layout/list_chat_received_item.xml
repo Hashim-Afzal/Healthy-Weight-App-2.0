@@ -10,16 +10,16 @@
         android:id="@+id/textMessageReceived"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_recieved_message"
+        android:background="@drawable/background_received_message"
         android:padding="12dp"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="13sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.8" />
 
     <TextView
-        android:id="@+id/textMessageSentDate"
+        android:id="@+id/textMessageReceivedDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/underline"
