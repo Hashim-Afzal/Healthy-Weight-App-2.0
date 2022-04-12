@@ -33,6 +33,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var messageList: ArrayList<MessageData>
     private lateinit var messageRef: CollectionReference
+    // private lateinit var
 
     companion object {
         const val UID_FRIEND_EXTRA = "UID_FRIEND_EXTRA"
@@ -48,9 +49,7 @@ class ChatActivity : AppCompatActivity() {
         val bundle :Bundle ?=intent.extras
         if (bundle!=null){
             val uidFriend = bundle.getString(UID_FRIEND_EXTRA)
-            val uidRefPath = if (auth.currentUser?.uid.toString().compareTo(uidFriend.toString()) < 0)
-                "${auth.currentUser?.uid.toString()}/${uidFriend}/" else "${uidFriend}/${auth.currentUser?.uid.toString()}/"
-            messageRef = Firebase.firestore.collection("conversations/${uidRefPath}")
+            messageRef = Firebase.firestore.collection("conversations/${auth.currentUser?.uid.toString()}/${uidFriend}/" )
             //Toast.makeText(this, uidRefPath, Toast.LENGTH_SHORT).show()
         } else {
             finish()

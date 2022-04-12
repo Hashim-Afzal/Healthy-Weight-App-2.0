@@ -32,6 +32,20 @@ exports.addUserToFirestoreUsers = functions.auth.user().onCreate((user) => {
   });
 });
 
+exports.impersonateMakeUpperCase = functions.database
+    .ref("/conversations/{uid1}/{uid2}/{msgId}")
+    .onCreate((snap, context) => {
+      const uid1 = context.params.uid1;
+      const uid2 = context.params.uid2;
+      const msgId = context.params.msgId;
+
+      const messageData = snap.val();
+      admin.firestore().collection(`/conversations/${uid2}/${uid1})`)
+          .doc(`/${msgId}`)
+          .set({messageData});
+    });
+
+/*
 exports.deleteUserToFirestore = functions.auth.user().onDelete((user) => {
   const usersRef = admin.firestore().collection("users").doc(user.uid);
   const friendRef = admin.firestore().collection("friends").doc(user.uid);
@@ -58,3 +72,5 @@ exports.deleteUserToFirestore = functions.auth.user().onDelete((user) => {
         {structuredData: true});
   });
 });
+*/
+
