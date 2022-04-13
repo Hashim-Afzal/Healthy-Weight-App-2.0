@@ -23,54 +23,20 @@ exports.addUserToFirestoreUsers = functions.auth.user().onCreate((user) => {
     userName: "",
     aboutMe: "",
   });
-
-  const friendRef = admin.firestore().collection("friends")
-      .doc(user.uid)
-      .collection("friendData");
-  friendRef.doc().set({
-    uid: user.uid,
-  });
 });
 
-exports.impersonateMakeUpperCase = functions.database
-    .ref("/conversations/{uid1}/{uid2}/{msgId}")
+exports.onCreateReciprocrateFriendShip = functions.firestore.document("/friends/{uid1}/friendData/{uid2}")
     .onCreate((snap, context) => {
       const uid1 = context.params.uid1;
       const uid2 = context.params.uid2;
-      const msgId = context.params.msgId;
+      //const friendData = snap.val();
 
-      const messageData = snap.val();
-      admin.firestore().collection(`/conversations/${uid2}/${uid1})`)
-          .doc(`/${msgId}`)
-          .set({messageData});
+      functions.logger.info(`Message data ${uid1}\\${uid2}`, {structuredData: true});
+      const newMessageRef =  admin.firestore().collection(`/friends/${uid2}/friendData`);
+      newMessageRef.doc(uid1).set({uid: uid1});
+
+      const usersRef = admin.firestore().collection("users");
+      return usersRef.doc(uid2).update({
+        meetFriend: false,
+      });
     });
-
-/*
-exports.deleteUserToFirestore = functions.auth.user().onDelete((user) => {
-  const usersRef = admin.firestore().collection("users").doc(user.uid);
-  const friendRef = admin.firestore().collection("friends").doc(user.uid);
-  const weightRef = admin.firestore().collection("weight").doc(user.uid);
-
-  usersRef.delete().then((message) => {
-    functions.logger.info("User's user data deleted", {structuredData: true});
-  }).catch((error) =>{
-    functions.logger.info("User's user data could not be deleted",
-        {structuredData: true});
-  });
-
-  friendRef.delete().then((message) => {
-    functions.logger.info("User's friend data deleted", {structuredData: true});
-  }).catch((error) =>{
-    functions.logger.info("User's friend data could not be deleted",
-        {structuredData: true});
-  });
-
-  weightRef.delete().then((message) => {
-    functions.logger.info("User's weight data deleted", {structuredData: true});
-  }).catch((error) =>{
-    functions.logger.info("User's weight data could not be deleted",
-        {structuredData: true});
-  });
-});
-*/
-

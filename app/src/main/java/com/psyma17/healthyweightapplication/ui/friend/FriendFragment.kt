@@ -47,7 +47,7 @@ class FriendFragment : Fragment() {
         _binding = FragmentFriendBinding.inflate(inflater, container, false)
         val root: View = binding.root
         auth = FirebaseAuth.getInstance()
-        friendRef = Firebase.firestore.collection("friends/" + auth.currentUser?.uid + "/friendData")
+        friendRef = Firebase.firestore.collection("friends/" + auth.currentUser?.uid.toString() + "/friendData")
 
         setUpRecyclerView()
         setUpSearchView()
@@ -70,7 +70,8 @@ class FriendFragment : Fragment() {
                     .get()
                     .addOnSuccessListener { documents ->
                         for (document in documents) {
-                            if (document.toObject<UserProfileData>().userName.contains(p0.toString(), ignoreCase = true)) {
+                            if (document.toObject<UserProfileData>().userName.contains(p0.toString(), ignoreCase = true)
+                                && document.toObject<UserProfileData>()?.uid != auth.currentUser?.uid) {
                                 userProfileListSearch.add(document.toObject<UserProfileData>())
                             }
                             Log.d("TAG setupSearchView", "${document.id} => ${document.data}")
@@ -98,6 +99,7 @@ class FriendFragment : Fragment() {
         binding.friendRecyclerView.adapter = friendsListAdapter
         friendsListAdapter.onItemClick = {
             Log.d("TAG", "User ID " + it.uid)
+            friendRef.document(it.uid).set(FriendData(uid = it.uid))
             val intent = Intent(activity, ChatActivity::class.java)
             intent.putExtra(ChatActivity.UID_FRIEND_EXTRA, it.uid)
             startActivity(intent)
@@ -112,7 +114,9 @@ class FriendFragment : Fragment() {
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     Log.d("TAG", "${document.id} => ${document.data}")
-                    arrayListFriendData.add(document.toObject<FriendData>())
+                    if (document.toObject<FriendData>().uid != auth.currentUser?.uid) {
+                        arrayListFriendData.add(document.toObject<FriendData>())
+                    }
                 }
                CoroutineScope(Dispatchers.IO).launch {
                    val arrayListUserProfileData = getUserProfileDataListFromFriendData(arrayListFriendData)
@@ -144,7 +148,7 @@ class FriendFragment : Fragment() {
             val document = Firebase.firestore.collection("users").document(uidFriend)
                 .get()
                 .await()
-            if (document != null) {
+            if (document != null && document.toObject<UserProfileData>()?.uid != auth.currentUser?.uid) {
                 Log.d("TAG", "DocumentSnapshot data: ${document.data}")
                 document.toObject<UserProfileData>()!!
             } else {

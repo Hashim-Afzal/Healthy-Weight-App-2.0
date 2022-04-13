@@ -49,7 +49,12 @@ class ChatActivity : AppCompatActivity() {
         val bundle :Bundle ?=intent.extras
         if (bundle!=null){
             val uidFriend = bundle.getString(UID_FRIEND_EXTRA)
-            messageRef = Firebase.firestore.collection("conversations/${auth.currentUser?.uid.toString()}/${uidFriend}/" )
+            val uidRefString: String = if (auth.currentUser?.uid.toString() < uidFriend.toString()) {
+                "${auth.currentUser?.uid.toString()}/${uidFriend}"
+            } else {
+                "${uidFriend}/${auth.currentUser?.uid.toString()}"
+            }
+            messageRef = Firebase.firestore.collection("conversations/${uidRefString}/" )
             //Toast.makeText(this, uidRefPath, Toast.LENGTH_SHORT).show()
         } else {
             finish()
@@ -80,10 +85,11 @@ class ChatActivity : AppCompatActivity() {
                     }
                 }
             }
+            binding.chatEtMessage.text.clear()
             val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         }
-        binding.chatEtMessage.text.clear()
+
     }
     private fun setUpRecyclerView() {
         messageList = ArrayList<MessageData>()
