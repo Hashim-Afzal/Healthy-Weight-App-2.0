@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.psyma17.healthyweightapplication.R
 import com.psyma17.healthyweightapplication.data.MessageData
+import java.text.SimpleDateFormat
 
 class ChatAdapter (private var messageList : ArrayList<MessageData>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var auth: FirebaseAuth
-    var onItemClick: ((MessageData) -> Unit)? = null
 
     override fun getItemViewType(position: Int): Int {
         auth = FirebaseAuth.getInstance()
@@ -38,24 +38,23 @@ class ChatAdapter (private var messageList : ArrayList<MessageData>) : RecyclerV
         }
     }
 
+    @SuppressLint("SimpleDateFormat", "SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         val currentItem = messageList[position]
+        val format = SimpleDateFormat("HH:mm dd.MM.yyyy ")
         when(holder.itemViewType) {
             0 -> {
                 val chatSentViewHolder : ChatSentViewHolder = holder as ChatSentViewHolder
                 holder.messageSent.text = currentItem.message
-                holder.dateSent.text = currentItem.dateSent.toString()
+                holder.dateSent.text = "Sent: ${format.format(currentItem.dateSent)}"
             }
             else -> {
-                val chatSentViewHolder : ChatReceiveViewHolder = holder as ChatReceiveViewHolder
+                val chatReceiveViewHolder : ChatReceiveViewHolder = holder as ChatReceiveViewHolder
                 holder.messageReceived.text = currentItem.message
-                holder.dateReceived.text = currentItem.dateSent.toString()
+                holder.dateReceived.text = "Sent: ${format.format(currentItem.dateSent)}"
             }
         }
-        // Change after implementing user images
-        // holder.friendsListImage.setImageResource(R.drawable.ic_baseline_person_24)
-        // holder.tvFriendName.text = currentItem.userName
     }
 
     override fun getItemCount(): Int {
@@ -76,16 +75,15 @@ class ChatAdapter (private var messageList : ArrayList<MessageData>) : RecyclerV
 
     }
 
-    inner class ChatSentViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
+    fun getItemAt(position: Int) : MessageData {
+        return messageList[position]
+    }
+
+    inner class ChatSentViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
 
         val messageSent : TextView = itemView.findViewById(R.id.textMessageSent)
         val dateSent : TextView = itemView.findViewById(R.id.textMessageSentDate)
 
-        init {
-            itemView.setOnClickListener {
-                onItemClick?.invoke(messageList[adapterPosition])
-            }
-        }
     }
 
     inner class ChatReceiveViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
@@ -93,11 +91,5 @@ class ChatAdapter (private var messageList : ArrayList<MessageData>) : RecyclerV
         val messageReceived : TextView = itemView.findViewById(R.id.textMessageReceived)
         val dateReceived : TextView = itemView.findViewById(R.id.textMessageReceivedDate)
 
-        init {
-            itemView.setOnClickListener {
-                onItemClick?.invoke(messageList[adapterPosition])
-            }
-        }
     }
-
 }

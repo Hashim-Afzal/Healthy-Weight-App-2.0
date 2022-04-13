@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HealthyWeightApplication</string>
+    <string name="app_name">Healthy Weight Application</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -42,6 +42,18 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="aboutMe">About me</string>
     <string name="currentWeight">Current weight:</string>
+
+    <string name="reportAbuse">Report Abuse</string>
+    <string name="reasonReport">Select the reason for the report</string>
+    <string-array name="reportReasons">
+        <item>Spam</item>
+        <item>Racism,Sexism, or Discrimination</item>
+        <item>Illegal Activity</item>
+        <item>Hate speech, Violence, or Threats</item>
+        <item>Scamming, Fraud, or Pyramid marketing</item>
+        <item>Spreading Eating Disorders</item>
+        <item>Other</item>
+    </string-array>
 
     <string-array name="objectives">
         <item>gain</item>

@@ -40,6 +40,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/chat_image_report"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="48dp"
+        android:padding="5dp"
+        android:src="@drawable/ic_baseline_outlined_flag_24"
+        app:layout_constraintEnd_toEndOf="@id/chat_image_info"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/chat_tv_friend_name"
         android:layout_width="0dp"
@@ -53,7 +64,7 @@
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/chat_image_back"
-        app:layout_constraintEnd_toStartOf="@id/chat_image_info"
+        app:layout_constraintEnd_toStartOf="@id/chat_image_report"
         app:layout_constraintStart_toEndOf="@id/chat_image_back"
         app:layout_constraintTop_toTopOf="@id/chat_image_back"
         />

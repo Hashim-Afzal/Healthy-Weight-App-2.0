@@ -102,6 +102,7 @@ class FriendFragment : Fragment() {
             friendRef.document(it.uid).set(FriendData(uid = it.uid))
             val intent = Intent(activity, ChatActivity::class.java)
             intent.putExtra(ChatActivity.UID_FRIEND_EXTRA, it.uid)
+            intent.putExtra(ChatActivity.FRIEND_NAME, it.userName)
             startActivity(intent)
         }
         addFriendsToRecyclerView()

@@ -1,13 +1,16 @@
 package com.psyma17.healthyweightapplication
 
+import com.psyma17.healthyweightapplication.R
 import android.app.Activity
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.SpinnerAdapter
 import android.widget.Toast
-import androidx.core.view.size
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -15,17 +18,14 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.psyma17.healthyweightapplication.Adapter.ChatAdapter
-import com.psyma17.healthyweightapplication.Adapter.FriendsListAdapter
 import com.psyma17.healthyweightapplication.data.MessageData
-import com.psyma17.healthyweightapplication.data.UserProfileData
-import com.psyma17.healthyweightapplication.data.WeightData
+import com.psyma17.healthyweightapplication.data.ReportData
 import com.psyma17.healthyweightapplication.databinding.ActivityChatBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.lang.StringBuilder
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatBinding
@@ -33,10 +33,12 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var messageList: ArrayList<MessageData>
     private lateinit var messageRef: CollectionReference
+    private lateinit var uidFriend: String
     // private lateinit var
 
     companion object {
         const val UID_FRIEND_EXTRA = "UID_FRIEND_EXTRA"
+        const val FRIEND_NAME = "FRIEND_NAME"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,13 +50,14 @@ class ChatActivity : AppCompatActivity() {
 
         val bundle :Bundle ?=intent.extras
         if (bundle!=null){
-            val uidFriend = bundle.getString(UID_FRIEND_EXTRA)
+            uidFriend = bundle.getString(UID_FRIEND_EXTRA).toString()
             val uidRefString: String = if (auth.currentUser?.uid.toString() < uidFriend.toString()) {
                 "${auth.currentUser?.uid.toString()}/${uidFriend}"
             } else {
                 "${uidFriend}/${auth.currentUser?.uid.toString()}"
             }
             messageRef = Firebase.firestore.collection("conversations/${uidRefString}/" )
+            binding.chatTvFriendName.text = bundle.getString(FRIEND_NAME)
             //Toast.makeText(this, uidRefPath, Toast.LENGTH_SHORT).show()
         } else {
             finish()
@@ -66,6 +69,76 @@ class ChatActivity : AppCompatActivity() {
 
     private fun setUpButtons() {
         setUpSendButton()
+        setUpBackButton()
+        setUpInfoButton()
+        setUpReportButton()
+    }
+
+    private fun setUpBackButton() {
+        binding.chatImageBack.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun setUpInfoButton() {
+        binding.chatImageInfo.setOnClickListener {
+            infoOnClickAlert()
+        }
+    }
+
+    private fun infoOnClickAlert() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Androidly Alert")
+        builder.setMessage("We have a message")
+        //builder.setPositiveButton("OK", DialogInterface.OnClickListener(function = x))
+
+        builder.setPositiveButton("yes") { dialog, which ->
+            // Toast.makeText(applicationContext, "yes", Toast.LENGTH_SHORT).show()
+        }
+        builder.show()
+    }
+
+    private fun setUpReportButton() {
+        binding.chatImageReport.setOnClickListener {
+            reportOnClickAlert()
+        }
+    }
+
+    private fun reportOnClickAlert() {
+        val builder = AlertDialog.Builder(this)
+
+        builder.setTitle(getString(R.string.reportAbuse))
+        builder.setMessage(getString(R.string.reasonReport))
+        //builder.setPositiveButton("OK", DialogInterface.OnClickListener(function = x))
+
+        val spinner: Spinner = Spinner(this)
+        val arrayAdapter: SpinnerAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.reportReasons,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        spinner.adapter = arrayAdapter
+        builder.setView(spinner)
+
+        builder.setPositiveButton("Report") { _, _ ->
+            CoroutineScope(Dispatchers.IO).launch {
+                Firebase.firestore.collection("reports/${uidFriend}/reportData")
+                    .document(auth.currentUser?.uid.toString()).set(
+                        ReportData(
+                            uidOfReported = uidFriend,
+                            uidOfReporter = auth.currentUser?.uid.toString(),
+                            reportReason = spinner.selectedItem.toString()
+                        )
+                    )
+                    .addOnSuccessListener {
+                            Toast.makeText(this@ChatActivity,"User successfully reported", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+        builder.setNegativeButton("Cancel") { _, _ -> }
+        builder.show()
     }
 
     private fun setUpSendButton() {
