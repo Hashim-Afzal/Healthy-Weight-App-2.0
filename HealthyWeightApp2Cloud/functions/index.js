@@ -23,38 +23,20 @@ exports.addUserToFirestoreUsers = functions.auth.user().onCreate((user) => {
     userName: "",
     aboutMe: "",
   });
-
-  const friendRef = admin.firestore().collection("friends")
-      .doc(user.uid)
-      .collection("friendData");
-  friendRef.doc().set({
-    uid: user.uid,
-  });
 });
 
-exports.deleteUserToFirestore = functions.auth.user().onDelete((user) => {
-  const usersRef = admin.firestore().collection("users").doc(user.uid);
-  const friendRef = admin.firestore().collection("friends").doc(user.uid);
-  const weightRef = admin.firestore().collection("weight").doc(user.uid);
+exports.onCreateReciprocrateFriendShip = functions.firestore.document("/friends/{uid1}/friendData/{uid2}")
+    .onCreate((snap, context) => {
+      const uid1 = context.params.uid1;
+      const uid2 = context.params.uid2;
+      //const friendData = snap.val();
 
-  usersRef.delete().then((message) => {
-    functions.logger.info("User's user data deleted", {structuredData: true});
-  }).catch((error) =>{
-    functions.logger.info("User's user data could not be deleted",
-        {structuredData: true});
-  });
+      functions.logger.info(`Message data ${uid1}\\${uid2}`, {structuredData: true});
+      const newMessageRef =  admin.firestore().collection(`/friends/${uid2}/friendData`);
+      newMessageRef.doc(uid1).set({uid: uid1});
 
-  friendRef.delete().then((message) => {
-    functions.logger.info("User's friend data deleted", {structuredData: true});
-  }).catch((error) =>{
-    functions.logger.info("User's friend data could not be deleted",
-        {structuredData: true});
-  });
-
-  weightRef.delete().then((message) => {
-    functions.logger.info("User's weight data deleted", {structuredData: true});
-  }).catch((error) =>{
-    functions.logger.info("User's weight data could not be deleted",
-        {structuredData: true});
-  });
-});
+      const usersRef = admin.firestore().collection("users");
+      return usersRef.doc(uid2).update({
+        meetFriend: false,
+      });
+    });
