@@ -123,11 +123,32 @@ class FriendFragment : Fragment() {
                    val arrayListUserProfileData = getUserProfileDataListFromFriendData(arrayListFriendData)
                    withContext(Dispatchers.Main) {
                        friendsListAdapter.setNewItems(arrayListUserProfileData)
+                       addPotentialFriendsToRecyclerView()
                    }
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d("TAG", "get failed with ", exception)
+            }
+    }
+
+    private fun addPotentialFriendsToRecyclerView() = CoroutineScope(Dispatchers.IO).launch {
+        val newFriends = ArrayList<UserProfileData>()
+        Firebase.firestore.collection("users")
+            .whereEqualTo("meetFriend", true)
+            .limit(20)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    Log.d("TAG", "Potential friend ${document.id} => ${document.data}")
+                    if (document.toObject<UserProfileData>().uid != auth.currentUser?.uid.toString()) {
+                        newFriends.add(document.toObject<UserProfileData>())
+                    }
+                }
+                friendsListAdapter.addNewItems(newFriends)
+            }
+            .addOnFailureListener { exception ->
+                Log.w("TAG", "Error getting documents: ", exception)
             }
     }
 

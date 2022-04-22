@@ -41,6 +41,12 @@ class FriendsListAdapter(private var userList : ArrayList<UserProfileData>) : Re
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun addNewItems(itemsNew: ArrayList<UserProfileData>){
+        userList.addAll(itemsNew)
+        notifyDataSetChanged()
+    }
+
     inner class FriendsListViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
 
         val friendsListImage : ShapeableImageView = itemView.findViewById(R.id.friend_list_image)
