@@ -1,5 +1,6 @@
 package com.psyma17.healthyweightapplication
 
+import android.annotation.SuppressLint
 import com.psyma17.healthyweightapplication.R
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
@@ -14,18 +15,20 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.psyma17.healthyweightapplication.Adapter.ChatAdapter
 import com.psyma17.healthyweightapplication.data.MessageData
 import com.psyma17.healthyweightapplication.data.ReportData
+import com.psyma17.healthyweightapplication.data.WeightData
 import com.psyma17.healthyweightapplication.databinding.ActivityChatBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatBinding
@@ -34,7 +37,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var messageList: ArrayList<MessageData>
     private lateinit var messageRef: CollectionReference
     private lateinit var uidFriend: String
-    // private lateinit var
+    private lateinit var weightDataList: ArrayList<WeightData>
 
     companion object {
         const val UID_FRIEND_EXTRA = "UID_FRIEND_EXTRA"
@@ -47,10 +50,12 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = FirebaseAuth.getInstance()
+        weightDataList = ArrayList<WeightData>()
 
         val bundle :Bundle ?=intent.extras
         if (bundle!=null){
             uidFriend = bundle.getString(UID_FRIEND_EXTRA).toString()
+            getWeightData(bundle.getString(UID_FRIEND_EXTRA).toString())
             val uidRefString: String = if (auth.currentUser?.uid.toString() < uidFriend.toString()) {
                 "${auth.currentUser?.uid.toString()}/${uidFriend}"
             } else {
@@ -86,16 +91,55 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun infoOnClickAlert() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Androidly Alert")
-        builder.setMessage("We have a message")
+        /*
+        val builder = AlertDialog.Builder(applicationContext)
+
+
+
         //builder.setPositiveButton("OK", DialogInterface.OnClickListener(function = x))
 
-        builder.setPositiveButton("yes") { dialog, which ->
+        builder.setPositiveButton(getString(R.string.close)) { dialog, which ->
             // Toast.makeText(applicationContext, "yes", Toast.LENGTH_SHORT).show()
         }
         builder.show()
+         */
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.weightInfo))
+
+        val sb: StringBuilder = StringBuilder()
+        val format = SimpleDateFormat("dd.MM.yyyy ")
+        for (weightData in weightDataList) {
+            sb.append("Weight ${weightData.weight} at ${format.format(weightData.time)}\n")
+        }
+        builder.setMessage(sb.toString())
+        //builder.setPositiveButton("OK", DialogInterface.OnClickListener(function = x))
+
+        builder.setPositiveButton(R.string.close) { dialog, which ->
+            // Toast.makeText(applicationContext, "yes", Toast.LENGTH_SHORT).show()
+        }
+        builder.show()
+    }
+
+    private fun getWeightData(uidFriend: String) = CoroutineScope(Dispatchers.IO).launch {
+        Firebase.firestore.collection("weight/" + uidFriend + "/weightData")
+            .orderBy("time", Query.Direction.DESCENDING)
+            .limit(5)
+            .get()
+            .addOnSuccessListener {
+                for (document in it.documents) {
+                    val weightData = document.toObject<WeightData>()
+                    if (weightData != null) {
+                        weightDataList.add(weightData)
+                        Log.d("Tag", "$weightData")
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Log.d("Tag", "Failed to retrieve data")
+            }
     }
 
     private fun setUpReportButton() {

@@ -6,8 +6,4 @@ import androidx.lifecycle.ViewModel
 
 class WeightViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is weight Fragment"
-    }
-    val text: LiveData<String> = _text
 }
