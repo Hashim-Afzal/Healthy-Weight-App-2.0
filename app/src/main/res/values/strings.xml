@@ -45,6 +45,8 @@
 
     <string name="reportAbuse">Report Abuse</string>
     <string name="reasonReport">Select the reason for the report</string>
+    <string name="weightInfo">Weight Information</string>
+    <string name="close">Close</string>
     <string-array name="reportReasons">
         <item>Spam</item>
         <item>Racism,Sexism, or Discrimination</item>

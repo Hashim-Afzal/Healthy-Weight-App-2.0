@@ -1,6 +1,8 @@
 package com.psyma17.healthyweightapplication.ui.weight
 
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
@@ -17,11 +23,8 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.psyma17.healthyweightapplication.data.WeightData
 import com.psyma17.healthyweightapplication.databinding.FragmentWeightBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.lang.StringBuilder
 
 class WeightFragment : Fragment() {
@@ -46,11 +49,6 @@ class WeightFragment : Fragment() {
         _binding = FragmentWeightBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSlideshow
-        weightViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-
         auth = FirebaseAuth.getInstance()
         weightDataCollectionRef = Firebase.firestore.collection("weight/" + auth.currentUser?.uid + "/weightData")
         subscribeToRealTimeUpdates()
@@ -71,14 +69,34 @@ class WeightFragment : Fragment() {
                 return@addSnapshotListener
             }
             value?.let {
-                val stringBuilder = StringBuilder()
+                val arrayList : ArrayList<WeightData> = ArrayList<WeightData>()
                 for (document in it.documents) {
                     val weightData = document.toObject<WeightData>()
-                    stringBuilder.append("$weightData\n")
+                    if (weightData != null) {
+                        arrayList.add(weightData)
+                    }
                 }
-                binding.textViewWeight.text = stringBuilder.toString()
+                if (arrayList.size > 0) {
+                    arrayList.sortBy { it.time }
+                    setLineChart(arrayList)
+                }
             }
         }
+    }
+
+    private fun setLineChart(weightList: ArrayList<WeightData>) {
+        val lineList: ArrayList<Entry> = ArrayList()
+        for (i in 0 until weightList.size) {
+            lineList.add(Entry(i.toFloat(), weightList[i].weight.toFloat()))
+        }
+        binding.lineChartWeight.invalidate()
+        val lineData: LineData
+        val lineDataSet: LineDataSet = LineDataSet(lineList, "Entries")
+        lineData = LineData(lineDataSet)
+        binding.lineChartWeight.data = lineData
+        lineDataSet.setColors(Color.BLACK)
+        lineDataSet!!.valueTextColor = Color.BLACK
+        binding.lineChartWeight.notifyDataSetChanged()
     }
 
     private fun saveWeightData(weightData: WeightData) = CoroutineScope(Dispatchers.IO).launch {
