@@ -2,19 +2,15 @@ package com.psyma17.healthyweightapplication.ui.weight
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
@@ -25,7 +21,6 @@ import com.psyma17.healthyweightapplication.data.WeightData
 import com.psyma17.healthyweightapplication.databinding.FragmentWeightBinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import java.lang.StringBuilder
 
 class WeightFragment : Fragment() {
 
@@ -91,11 +86,12 @@ class WeightFragment : Fragment() {
         }
         binding.lineChartWeight.invalidate()
         val lineData: LineData
-        val lineDataSet: LineDataSet = LineDataSet(lineList, "Entries")
+        val lineDataSet: LineDataSet = LineDataSet(lineList, "Weight")
         lineData = LineData(lineDataSet)
         binding.lineChartWeight.data = lineData
         lineDataSet.setColors(Color.BLACK)
-        lineDataSet!!.valueTextColor = Color.BLACK
+        lineDataSet.valueTextColor = Color.BLACK
+        lineDataSet.valueTextSize = 12f
         binding.lineChartWeight.notifyDataSetChanged()
     }
 
